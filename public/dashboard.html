@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Document Summary App</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="container">
+                <a href="/dashboard.html" class="navbar-brand">
+                    📄 Document Summary
+                </a>
+                <div class="user-menu">
+                    <span id="apiStatus"></span>
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <span id="userName">User</span>
+                    <button class="btn btn-outline btn-sm" onclick="showProfileModal()">Profile</button>
+                    <a href="#" class="btn btn-sm btn-secondary" id="logoutBtn">Logout</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Dashboard Content -->
+        <main class="dashboard">
+            <div class="container">
+                <!-- Header -->
+                <div class="dashboard-header">
+                    <h1>Dashboard</h1>
+                    <p class="text-muted">Manage your documents and summaries</p>
+                </div>
+
+                <!-- Stats -->
+                <div class="dashboard-grid">
+                    <div class="card stat-card">
+                        <div class="stat-icon primary">📄</div>
+                        <div class="stat-value" id="totalDocuments">0</div>
+                        <div class="stat-label">Total Documents</div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-icon success">📝</div>
+                        <div class="stat-value" id="totalSummaries">0</div>
+                        <div class="stat-label">Total Summaries</div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-icon warning">🤖</div>
+                        <div class="stat-value">GPT</div>
+                        <div class="stat-label">AI Model</div>
+                    </div>
+                </div>
+
+                <!-- Upload Area -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="upload-area" id="uploadArea">
+                            <div class="upload-icon">📤</div>
+                            <h3>Upload PDF Documents</h3>
+                            <p>Drag and drop files here or click to browse</p>
+                            <p><small>Maximum file size: 50MB | PDF files only</small></p>
+                            <input type="file" id="fileInput" accept=".pdf" multiple>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <div class="card">
+                    <div class="tabs">
+                        <button class="tab active" data-tab="documents">Documents</button>
+                        <button class="tab" data-tab="summaries">Summaries</button>
+                    </div>
+
+                    <!-- Documents Tab -->
+                    <div class="tab-content" id="documentsTab">
+                        <div class="card-header">
+                            <h3>Your Documents</h3>
+                            <div id="selectionActions" class="d-flex align-center gap-2 hidden"></div>
+                        </div>
+                        <div class="card-body">
+                            <div class="document-list" id="documentsList">
+                                <div class="empty-state">
+                                    <div class="empty-icon">📄</div>
+                                    <h3>No documents yet</h3>
+                                    <p>Upload your first PDF to get started</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Summaries Tab -->
+                    <div class="tab-content hidden" id="summariesTab">
+                        <div class="card-header">
+                            <h3>Your Summaries</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="document-list" id="summariesList">
+                                <div class="empty-state">
+                                    <div class="empty-icon">📝</div>
+                                    <h3>No summaries yet</h3>
+                                    <p>Generate your first summary from a document</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal-backdrop" id="profileModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Edit Profile</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="profileForm">
+                    <div class="form-group">
+                        <label for="profileFullName" class="form-label">Full Name</label>
+                        <input type="text" id="profileFullName" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="profileEmail" class="form-label">Email</label>
+                        <input type="email" id="profileEmail" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="profileDescription" class="form-label">Description (optional)</label>
+                        <textarea id="profileDescription" class="form-input" rows="3"></textarea>
+                    </div>
+                    <div class="d-flex justify-between gap-2">
+                        <button type="button" class="btn btn-outline" onclick="closeModal('profileModal')">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Modal -->
+    <div class="modal-backdrop" id="summaryModal">
+        <div class="modal" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2>Summary</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="summary-content"></div>
+                <div class="summary-meta"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('summaryModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Document Modal -->
+    <div class="modal-backdrop" id="documentModal">
+        <div class="modal" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2>Document</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="document-text" style="max-height: 500px; overflow-y: auto; white-space: pre-wrap; font-family: monospace; font-size: 0.875rem; background: var(--background-color); padding: 1rem; border-radius: var(--radius-md);"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('documentModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/dashboard.js"></script>
+</body>
+</html>

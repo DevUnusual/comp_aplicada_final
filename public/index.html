@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Summary App</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="container">
+                <a href="/" class="navbar-brand">
+                    📄 Document Summary
+                </a>
+                <ul class="navbar-nav">
+                    <li><a href="/login.html" class="btn btn-outline">Login</a></li>
+                    <li><a href="/register.html" class="btn btn-primary">Get Started</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section style="padding: 6rem 0; text-align: center; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);">
+            <div class="container">
+                <h1 style="font-size: 3rem; margin-bottom: 1.5rem; color: var(--text-primary);">
+                    Transform Your PDFs into<br>
+                    <span style="color: var(--primary-color);">Intelligent Summaries</span>
+                </h1>
+                <p style="font-size: 1.25rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto 2rem;">
+                    Upload your PDF documents and let AI generate comprehensive summaries. 
+                    Analyze individual documents or create integrated summaries from multiple files.
+                </p>
+                <div style="display: flex; gap: 1rem; justify-content: center;">
+                    <a href="/register.html" class="btn btn-primary btn-lg">Start Free</a>
+                    <a href="/login.html" class="btn btn-outline btn-lg">Sign In</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section style="padding: 5rem 0;">
+            <div class="container">
+                <h2 style="text-align: center; margin-bottom: 3rem;">Key Features</h2>
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <div class="card-body" style="text-align: center; padding: 2rem;">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">📤</div>
+                            <h3>Easy Upload</h3>
+                            <p class="text-muted mt-1">
+                                Drag & drop or click to upload PDFs up to 50MB. 
+                                Supports batch uploads.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body" style="text-align: center; padding: 2rem;">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">🤖</div>
+                            <h3>AI-Powered Summaries</h3>
+                            <p class="text-muted mt-1">
+                                Leverage OpenAI's GPT models to generate 
+                                accurate and comprehensive summaries.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body" style="text-align: center; padding: 2rem;">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">📊</div>
+                            <h3>Multi-Document Analysis</h3>
+                            <p class="text-muted mt-1">
+                                Combine multiple documents into a single 
+                                integrated summary with cross-references.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How it Works -->
+        <section style="padding: 5rem 0; background-color: var(--background-color);">
+            <div class="container">
+                <h2 style="text-align: center; margin-bottom: 3rem;">How It Works</h2>
+                <div style="display: flex; flex-wrap: wrap; gap: 2rem; justify-content: center;">
+                    <div style="text-align: center; max-width: 250px;">
+                        <div style="width: 60px; height: 60px; background: var(--primary-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin: 0 auto 1rem;">1</div>
+                        <h3>Upload</h3>
+                        <p class="text-muted">Upload your PDF documents to the platform</p>
+                    </div>
+                    <div style="text-align: center; max-width: 250px;">
+                        <div style="width: 60px; height: 60px; background: var(--primary-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin: 0 auto 1rem;">2</div>
+                        <h3>Select</h3>
+                        <p class="text-muted">Choose one or multiple documents to summarize</p>
+                    </div>
+                    <div style="text-align: center; max-width: 250px;">
+                        <div style="width: 60px; height: 60px; background: var(--primary-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin: 0 auto 1rem;">3</div>
+                        <h3>Summarize</h3>
+                        <p class="text-muted">AI generates comprehensive summaries instantly</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section style="padding: 5rem 0; text-align: center;">
+            <div class="container">
+                <h2 style="margin-bottom: 1rem;">Ready to Get Started?</h2>
+                <p class="text-muted" style="margin-bottom: 2rem;">Create your free account and start summarizing documents today.</p>
+                <a href="/register.html" class="btn btn-primary btn-lg">Create Free Account</a>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer style="padding: 2rem 0; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-secondary);">
+            <div class="container">
+                <p>&copy; 2024 Document Summary App. Built with Node.js and OpenAI.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script>
+        // Redirect to dashboard if already logged in
+        if (API.Auth.isAuthenticated()) {
+            window.location.href = '/dashboard.html';
+        }
+    </script>
+</body>
+</html>
