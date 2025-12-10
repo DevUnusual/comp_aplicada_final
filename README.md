@@ -2,6 +2,8 @@
 
 Aplicação web para gerenciamento e análise de documentos PDF com capacidade de geração de resumos individuais e integrados utilizando **LangChain** + LLM (OpenAI GPT).
 
+[![Tecnologies](https://skillicons.dev/icons?i=js,html,css,nodejs,aws,express,npm)](https://skillicons.dev)
+
 ## 🚀 Features
 
 - **Autenticação completa**: Registro, login, edição de perfil
