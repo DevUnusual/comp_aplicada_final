@@ -208,7 +208,7 @@ sudo apt install -y nodejs
 ### 2. Clonar e Configurar
 
 ```bash
-cd /home/ubuntu
+cd /home/ubuntu/app
 git clone <repo-url> document-summary-app
 cd document-summary-app
 
