@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Document Summary App</title>
+    <title>Painel - App Resumo de Documentos</title>
     <link rel="stylesheet" href="/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -13,14 +13,14 @@
         <nav class="navbar">
             <div class="container">
                 <a href="/dashboard.html" class="navbar-brand">
-                    📄 Document Summary
+                    📄 Resumo de Documentos
                 </a>
                 <div class="user-menu">
                     <span id="apiStatus"></span>
                     <div class="user-avatar" id="userAvatar">U</div>
-                    <span id="userName">User</span>
-                    <button class="btn btn-outline btn-sm" onclick="showProfileModal()">Profile</button>
-                    <a href="#" class="btn btn-sm btn-secondary" id="logoutBtn">Logout</a>
+                    <span id="userName">Usuário</span>
+                    <button class="btn btn-outline btn-sm" onclick="showProfileModal()">Perfil</button>
+                    <a href="#" class="btn btn-sm btn-secondary" id="logoutBtn">Sair</a>
                 </div>
             </div>
         </nav>
@@ -30,8 +30,8 @@
             <div class="container">
                 <!-- Header -->
                 <div class="dashboard-header">
-                    <h1>Dashboard</h1>
-                    <p class="text-muted">Manage your documents and summaries</p>
+                    <h1>Painel</h1>
+                    <p class="text-muted">Gerencie seus documentos e resumos</p>
                 </div>
 
                 <!-- Stats -->
@@ -39,17 +39,17 @@
                     <div class="card stat-card">
                         <div class="stat-icon primary">📄</div>
                         <div class="stat-value" id="totalDocuments">0</div>
-                        <div class="stat-label">Total Documents</div>
+                        <div class="stat-label">Total de Documentos</div>
                     </div>
                     <div class="card stat-card">
                         <div class="stat-icon success">📝</div>
                         <div class="stat-value" id="totalSummaries">0</div>
-                        <div class="stat-label">Total Summaries</div>
+                        <div class="stat-label">Total de Resumos</div>
                     </div>
                     <div class="card stat-card">
                         <div class="stat-icon warning">🤖</div>
                         <div class="stat-value">GPT</div>
-                        <div class="stat-label">AI Model</div>
+                        <div class="stat-label">Modelo de IA</div>
                     </div>
                 </div>
 
@@ -58,9 +58,9 @@
                     <div class="card-body">
                         <div class="upload-area" id="uploadArea">
                             <div class="upload-icon">📤</div>
-                            <h3>Upload PDF Documents</h3>
-                            <p>Drag and drop files here or click to browse</p>
-                            <p><small>Maximum file size: 50MB | PDF files only</small></p>
+                            <h3>Envie Documentos PDF</h3>
+                            <p>Arraste e solte arquivos aqui ou clique para procurar</p>
+                            <p><small>Tamanho máximo: 50MB | Apenas arquivos PDF</small></p>
                             <input type="file" id="fileInput" accept=".pdf" multiple>
                         </div>
                     </div>
@@ -69,22 +69,22 @@
                 <!-- Tabs -->
                 <div class="card">
                     <div class="tabs">
-                        <button class="tab active" data-tab="documents">Documents</button>
-                        <button class="tab" data-tab="summaries">Summaries</button>
+                        <button class="tab active" data-tab="documents">Documentos</button>
+                        <button class="tab" data-tab="summaries">Resumos</button>
                     </div>
 
                     <!-- Documents Tab -->
                     <div class="tab-content" id="documentsTab">
                         <div class="card-header">
-                            <h3>Your Documents</h3>
+                            <h3>Seus Documentos</h3>
                             <div id="selectionActions" class="d-flex align-center gap-2 hidden"></div>
                         </div>
                         <div class="card-body">
                             <div class="document-list" id="documentsList">
                                 <div class="empty-state">
                                     <div class="empty-icon">📄</div>
-                                    <h3>No documents yet</h3>
-                                    <p>Upload your first PDF to get started</p>
+                                    <h3>Nenhum documento ainda</h3>
+                                    <p>Envie seu primeiro PDF para começar</p>
                                 </div>
                             </div>
                         </div>
@@ -93,14 +93,14 @@
                     <!-- Summaries Tab -->
                     <div class="tab-content hidden" id="summariesTab">
                         <div class="card-header">
-                            <h3>Your Summaries</h3>
+                            <h3>Seus Resumos</h3>
                         </div>
                         <div class="card-body">
                             <div class="document-list" id="summariesList">
                                 <div class="empty-state">
                                     <div class="empty-icon">📝</div>
-                                    <h3>No summaries yet</h3>
-                                    <p>Generate your first summary from a document</p>
+                                    <h3>Nenhum resumo ainda</h3>
+                                    <p>Gere seu primeiro resumo a partir de um documento</p>
                                 </div>
                             </div>
                         </div>
@@ -114,13 +114,13 @@
     <div class="modal-backdrop" id="profileModal">
         <div class="modal">
             <div class="modal-header">
-                <h2>Edit Profile</h2>
+                <h2>Editar Perfil</h2>
                 <button class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="profileForm">
                     <div class="form-group">
-                        <label for="profileFullName" class="form-label">Full Name</label>
+                        <label for="profileFullName" class="form-label">Nome Completo</label>
                         <input type="text" id="profileFullName" class="form-input" required>
                     </div>
                     <div class="form-group">
@@ -128,12 +128,12 @@
                         <input type="email" id="profileEmail" class="form-input" required>
                     </div>
                     <div class="form-group">
-                        <label for="profileDescription" class="form-label">Description (optional)</label>
+                        <label for="profileDescription" class="form-label">Descrição (opcional)</label>
                         <textarea id="profileDescription" class="form-input" rows="3"></textarea>
                     </div>
                     <div class="d-flex justify-between gap-2">
-                        <button type="button" class="btn btn-outline" onclick="closeModal('profileModal')">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <button type="button" class="btn btn-outline" onclick="closeModal('profileModal')">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
                     </div>
                 </form>
             </div>
@@ -144,7 +144,7 @@
     <div class="modal-backdrop" id="summaryModal">
         <div class="modal" style="max-width: 800px;">
             <div class="modal-header">
-                <h2>Summary</h2>
+                <h2>Resumo</h2>
                 <button class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
@@ -152,7 +152,7 @@
                 <div class="summary-meta"></div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-outline" onclick="closeModal('summaryModal')">Close</button>
+                <button class="btn btn-outline" onclick="closeModal('summaryModal')">Fechar</button>
             </div>
         </div>
     </div>
@@ -161,14 +161,14 @@
     <div class="modal-backdrop" id="documentModal">
         <div class="modal" style="max-width: 800px;">
             <div class="modal-header">
-                <h2>Document</h2>
+                <h2>Documento</h2>
                 <button class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="document-text" style="max-height: 500px; overflow-y: auto; white-space: pre-wrap; font-family: monospace; font-size: 0.875rem; background: var(--background-color); padding: 1rem; border-radius: var(--radius-md);"></div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-outline" onclick="closeModal('documentModal')">Close</button>
+                <button class="btn btn-outline" onclick="closeModal('documentModal')">Fechar</button>
             </div>
         </div>
     </div>
