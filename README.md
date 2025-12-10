@@ -15,10 +15,7 @@ Aplicação web para gerenciamento e análise de documentos PDF com capacidade d
 ## 🛠️ Tecnologias
 
 - **Backend**: Node.js + Express.js (ES Modules)
-- **LangChain**: v0.3.x - Framework para LLM
-  - `@langchain/openai` - Integração com OpenAI
-  - `@langchain/community` - PDFLoader
-  - `langchain` - Chains e Text Splitters
+- **LangChain**: v1.1.5 - Framework para LLM
 - **Banco de Dados**: JSON file-based (simples, sem dependências)
 - **Autenticação**: JWT + bcrypt
 - **Upload**: Multer

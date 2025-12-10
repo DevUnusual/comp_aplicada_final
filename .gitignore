@@ -34,3 +34,6 @@ build/
 
 # Test coverage
 coverage/
+
+pathfinder.py
+tree.md

@@ -2,27 +2,27 @@ import { ChatOpenAI } from '@langchain/openai';
 import { PromptTemplate } from '@langchain/core/prompts';
 import { StringOutputParser } from '@langchain/core/output_parsers';
 import { RunnableSequence } from '@langchain/core/runnables';
-import { loadSummarizationChain } from 'langchain/chains';
-import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
+import { loadSummarizationChain } from '@langchain/classic/chains';
+import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import { Document } from '@langchain/core/documents';
 import { isConfigured, DEFAULT_MODEL } from '../config/langchain.js';
 
 /**
- * Prompts para sumarização em português
+ * Prompts para sumarizaÃ§Ã£o em portuguÃªs
  */
 const SUMMARY_PROMPTS = {
     single: {
-        system: `Você é um especialista em análise e síntese de documentos. 
-Sua tarefa é criar resumos claros, concisos e abrangentes.
+        system: `VocÃª Ã© um especialista em anÃ¡lise e sÃ­ntese de documentos. 
+Sua tarefa Ã© criar resumos claros, concisos e abrangentes.
 
 Diretrizes:
-- Escreva o resumo em português
-- Capture os pontos principais e informações-chave
-- Mantenha a estrutura lógica do conteúdo original
+- Escreva o resumo em portuguÃªs
+- Capture os pontos principais e informaÃ§Ãµes-chave
+- Mantenha a estrutura lÃ³gica do conteÃºdo original
 - Seja objetivo e preciso
 - Mantenha o resumo informativo mas conciso`,
         
-        human: `Por favor, forneça um resumo abrangente do seguinte documento:
+        human: `Por favor, forneÃ§a um resumo abrangente do seguinte documento:
 
 {text}
 
@@ -30,17 +30,17 @@ RESUMO:`
     },
     
     multiple: {
-        system: `Você é um analista de documentos especializado em síntese integrada.
-Sua tarefa é analisar múltiplos documentos e criar um resumo integrado.
+        system: `VocÃª Ã© um analista de documentos especializado em sÃ­ntese integrada.
+Sua tarefa Ã© analisar mÃºltiplos documentos e criar um resumo integrado.
 
 Diretrizes:
-- Escreva o resumo em português
-- Identifique temas comuns e conexões entre os documentos
-- Destaque diferenças ou contradições importantes
-- Sintetize as informações em uma narrativa coerente
-- Referencie qual documento contém cada informação quando relevante`,
+- Escreva o resumo em portuguÃªs
+- Identifique temas comuns e conexÃµes entre os documentos
+- Destaque diferenÃ§as ou contradiÃ§Ãµes importantes
+- Sintetize as informaÃ§Ãµes em uma narrativa coerente
+- Referencie qual documento contÃ©m cada informaÃ§Ã£o quando relevante`,
         
-        human: `Analise os seguintes {count} documentos e forneça um resumo integrado que sintetize as informações principais:
+        human: `Analise os seguintes {count} documentos e forneÃ§a um resumo integrado que sintetize as informaÃ§Ãµes principais:
 
 {documents}
 
@@ -54,17 +54,17 @@ RESUMO INTEGRADO:`
 
 RESUMO CONCISO:`,
 
-    combinePrompt: `Os seguintes são resumos de diferentes partes de um documento:
+    combinePrompt: `Os seguintes sÃ£o resumos de diferentes partes de um documento:
 
 {text}
 
-Combine esses resumos em um resumo final consolidado e coerente em português.
+Combine esses resumos em um resumo final consolidado e coerente em portuguÃªs.
 
 RESUMO FINAL:`
 };
 
 /**
- * Cria uma instância do ChatOpenAI
+ * Cria uma instÃ¢ncia do ChatOpenAI
  */
 function createModel(options = {}) {
     const {
@@ -74,17 +74,17 @@ function createModel(options = {}) {
     } = options;
 
     return new ChatOpenAI({
-        modelName: model,
+        model: model,
         temperature,
         maxTokens,
-        openAIApiKey: process.env.OPENAI_API_KEY,
+        apiKey: process.env.OPENAI_API_KEY,
     });
 }
 
 /**
- * Gera resumo de um único documento
+ * Gera resumo de um Ãºnico documento
  * @param {string} text - Texto do documento
- * @param {object} options - Opções
+ * @param {object} options - OpÃ§Ãµes
  * @returns {Promise<{summary: string, tokensUsed: number, model: string}>}
  */
 export async function generateSingleSummary(text, options = {}) {
@@ -195,9 +195,9 @@ async function generateMapReduceSummary(text, options = {}) {
 }
 
 /**
- * Gera resumo integrado de múltiplos documentos
+ * Gera resumo integrado de mÃºltiplos documentos
  * @param {Array<{name: string, text: string}>} documents - Array de documentos
- * @param {object} options - Opções
+ * @param {object} options - OpÃ§Ãµes
  * @returns {Promise<{summary: string, tokensUsed: number, model: string}>}
  */
 export async function generateMultipleSummary(documents, options = {}) {
@@ -267,7 +267,7 @@ export async function generateMultipleSummary(documents, options = {}) {
 }
 
 /**
- * Sumarização hierárquica para múltiplos documentos grandes
+ * SumarizaÃ§Ã£o hierÃ¡rquica para mÃºltiplos documentos grandes
  * Primeiro sumariza cada documento, depois combina
  */
 async function generateHierarchicalSummary(documents, options = {}) {
@@ -300,11 +300,11 @@ async function generateHierarchicalSummary(documents, options = {}) {
         .join('\n\n');
 
     const combinePrompt = PromptTemplate.fromTemplate(
-        `Você recebeu resumos de ${documents.length} documentos diferentes.
+        `VocÃª recebeu resumos de ${documents.length} documentos diferentes.
 Crie um resumo integrado final que:
-- Sintetize as informações principais de todos os documentos
+- Sintetize as informaÃ§Ãµes principais de todos os documentos
 - Identifique temas e pontos em comum
-- Destaque diferenças importantes
+- Destaque diferenÃ§as importantes
 - Seja coerente e bem estruturado
 
 Resumos dos documentos:
@@ -336,7 +336,7 @@ RESUMO INTEGRADO FINAL:`
 }
 
 /**
- * Testa conexão com a API
+ * Testa conexÃ£o com a API
  */
 export async function testConnection() {
     if (!isConfigured()) {

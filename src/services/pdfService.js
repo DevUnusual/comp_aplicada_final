@@ -1,5 +1,5 @@
 import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf';
-import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
+import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 
 /**
  * Carrega e extrai texto de um PDF usando LangChain PDFLoader

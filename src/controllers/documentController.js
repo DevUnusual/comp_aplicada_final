@@ -10,7 +10,7 @@ import { loadAndExtractPDF, cleanText } from '../services/pdfService.js';
 export async function uploadDocument(req, res) {
     try {
         if (!req.file) {
-            return res.status(400).json({ error: 'No file uploaded' });
+            return res.status(400).json({ error: 'Nenhum arquivo enviado' });
         }
 
         const file = req.file;
@@ -33,7 +33,7 @@ export async function uploadDocument(req, res) {
         extractTextAsync(document.id);
 
         res.status(201).json({
-            message: 'Document uploaded successfully',
+            message: 'Documento enviado com sucesso',
             document: {
                 id: document.id,
                 originalName: document.originalName,
@@ -49,7 +49,7 @@ export async function uploadDocument(req, res) {
             await deleteFile(req.file.path).catch(console.error);
         }
         
-        res.status(500).json({ error: 'Failed to upload document' });
+        res.status(500).json({ error: 'Falha ao enviar documento' });
     }
 }
 
@@ -60,7 +60,7 @@ export async function uploadDocument(req, res) {
 export async function uploadMultipleDocuments(req, res) {
     try {
         if (!req.files || req.files.length === 0) {
-            return res.status(400).json({ error: 'No files uploaded' });
+            return res.status(400).json({ error: 'Nenhum arquivo enviado' });
         }
 
         const documents = [];
@@ -87,7 +87,7 @@ export async function uploadMultipleDocuments(req, res) {
         }
 
         res.status(201).json({
-            message: `${documents.length} documents uploaded successfully`,
+            message: `${documents.length} documentos enviados com sucesso`,
             documents: documents.map(doc => ({
                 id: doc.id,
                 originalName: doc.originalName,
@@ -105,7 +105,7 @@ export async function uploadMultipleDocuments(req, res) {
             }
         }
         
-        res.status(500).json({ error: 'Failed to upload documents' });
+        res.status(500).json({ error: 'Falha ao enviar documentos' });
     }
 }
 
@@ -180,7 +180,7 @@ export async function getDocuments(req, res) {
         });
     } catch (error) {
         console.error('Get documents error:', error);
-        res.status(500).json({ error: 'Failed to get documents' });
+        res.status(500).json({ error: 'Falha ao obter documentos' });
     }
 }
 
@@ -196,7 +196,7 @@ export async function getDocument(req, res) {
         const document = db.findDocumentById(id);
 
         if (!document || document.userId !== req.userId) {
-            return res.status(404).json({ error: 'Document not found' });
+            return res.status(404).json({ error: 'Documento não encontrado' });
         }
 
         const response = {
@@ -217,7 +217,7 @@ export async function getDocument(req, res) {
         res.json({ document: response });
     } catch (error) {
         console.error('Get document error:', error);
-        res.status(500).json({ error: 'Failed to get document' });
+        res.status(500).json({ error: 'Falha ao obter documento' });
     }
 }
 
@@ -232,16 +232,16 @@ export async function deleteDocument(req, res) {
         const document = db.findDocumentById(id);
 
         if (!document || document.userId !== req.userId) {
-            return res.status(404).json({ error: 'Document not found' });
+            return res.status(404).json({ error: 'Documento não encontrado' });
         }
 
         await deleteFile(document.filePath).catch(console.error);
         db.deleteDocument(id);
 
-        res.json({ message: 'Document deleted successfully' });
+        res.json({ message: 'Documento deletado com sucesso' });
     } catch (error) {
         console.error('Delete document error:', error);
-        res.status(500).json({ error: 'Failed to delete document' });
+        res.status(500).json({ error: 'Falha ao deletar documento' });
     }
 }
 
@@ -254,7 +254,7 @@ export async function deleteMultipleDocuments(req, res) {
         const { ids } = req.body;
 
         if (!ids || !Array.isArray(ids) || ids.length === 0) {
-            return res.status(400).json({ error: 'Document IDs are required' });
+            return res.status(400).json({ error: 'IDs de documentos são obrigatórios' });
         }
 
         let deletedCount = 0;
@@ -269,12 +269,12 @@ export async function deleteMultipleDocuments(req, res) {
         }
 
         res.json({ 
-            message: `${deletedCount} documents deleted successfully`,
+            message: `${deletedCount} documentos deletados com sucesso`,
             deletedCount
         });
     } catch (error) {
         console.error('Delete multiple documents error:', error);
-        res.status(500).json({ error: 'Failed to delete documents' });
+        res.status(500).json({ error: 'Falha ao deletar documentos' });
     }
 }
 
@@ -289,7 +289,7 @@ export async function reprocessDocument(req, res) {
         const document = db.findDocumentById(id);
 
         if (!document || document.userId !== req.userId) {
-            return res.status(404).json({ error: 'Document not found' });
+            return res.status(404).json({ error: 'Documento não encontrado' });
         }
 
         db.updateDocument(id, {
@@ -300,7 +300,7 @@ export async function reprocessDocument(req, res) {
         extractTextAsync(id);
 
         res.json({ 
-            message: 'Document reprocessing started',
+            message: 'Reprocessamento do documento iniciado',
             document: {
                 id: document.id,
                 status: 'processing'
@@ -308,7 +308,7 @@ export async function reprocessDocument(req, res) {
         });
     } catch (error) {
         console.error('Reprocess document error:', error);
-        res.status(500).json({ error: 'Failed to reprocess document' });
+        res.status(500).json({ error: 'Falha ao reprocessar documento' });
     }
 }
 

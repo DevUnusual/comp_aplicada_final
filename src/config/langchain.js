@@ -44,10 +44,10 @@ export function createChatModel(options = {}) {
     }
 
     return new ChatOpenAI({
-        modelName: model,
+        model: model,
         temperature,
         maxTokens,
-        openAIApiKey: process.env.OPENAI_API_KEY,
+        apiKey: process.env.OPENAI_API_KEY,
     });
 }
 

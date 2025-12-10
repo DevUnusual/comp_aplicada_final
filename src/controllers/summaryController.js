@@ -20,30 +20,30 @@ export async function createSingleSummary(req, res) {
         const { documentId, title, model } = req.body;
 
         if (!documentId) {
-            return res.status(400).json({ error: 'Document ID is required' });
+            return res.status(400).json({ error: 'ID do documento é obrigatório' });
         }
 
         if (!isConfigured()) {
             return res.status(503).json({ 
-                error: 'OpenAI API is not configured. Please set OPENAI_API_KEY in environment.' 
+                error: 'API da OpenAI não está configurada. Por favor, defina OPENAI_API_KEY no ambiente.' 
             });
         }
 
         const document = db.findDocumentById(documentId);
 
         if (!document || document.userId !== req.userId) {
-            return res.status(404).json({ error: 'Document not found' });
+            return res.status(404).json({ error: 'Documento não encontrado' });
         }
 
         if (document.status !== 'processed') {
             return res.status(400).json({ 
-                error: `Document is not ready for summarization. Status: ${document.status}` 
+                error: `Documento não está pronto para resumo. Status: ${document.status}` 
             });
         }
 
         if (!document.extractedText || document.extractedText.trim().length === 0) {
             return res.status(400).json({ 
-                error: 'Document has no text content to summarize' 
+                error: 'Documento não possui conteúdo de texto para resumir' 
             });
         }
 
@@ -69,7 +69,7 @@ export async function createSingleSummary(req, res) {
         });
 
         res.status(201).json({
-            message: 'Summary generated successfully',
+            message: 'Resumo gerado com sucesso',
             summary: {
                 id: summary.id,
                 title: summary.title,
@@ -85,7 +85,7 @@ export async function createSingleSummary(req, res) {
         });
     } catch (error) {
         console.error('Create single summary error:', error);
-        res.status(500).json({ error: error.message || 'Failed to generate summary' });
+        res.status(500).json({ error: error.message || 'Falha ao gerar resumo' });
     }
 }
 
@@ -99,13 +99,13 @@ export async function createMultipleSummary(req, res) {
 
         if (!documentIds || !Array.isArray(documentIds) || documentIds.length < 2) {
             return res.status(400).json({ 
-                error: 'At least 2 document IDs are required' 
+                error: 'Pelo menos 2 IDs de documentos são obrigatórios' 
             });
         }
 
         if (!isConfigured()) {
             return res.status(503).json({ 
-                error: 'OpenAI API is not configured. Please set OPENAI_API_KEY in environment.' 
+                error: 'API da OpenAI não está configurada. Por favor, defina OPENAI_API_KEY no ambiente.' 
             });
         }
 
@@ -120,7 +120,7 @@ export async function createMultipleSummary(req, res) {
 
         if (documents.length < 2) {
             return res.status(400).json({ 
-                error: 'At least 2 processed documents with text content are required' 
+                error: 'Pelo menos 2 documentos processados com conteúdo de texto são obrigatórios' 
             });
         }
 
@@ -152,7 +152,7 @@ export async function createMultipleSummary(req, res) {
         });
 
         res.status(201).json({
-            message: 'Integrated summary generated successfully',
+            message: 'Resumo integrado gerado com sucesso',
             summary: {
                 id: summary.id,
                 title: summary.title,
@@ -172,7 +172,7 @@ export async function createMultipleSummary(req, res) {
         });
     } catch (error) {
         console.error('Create multiple summary error:', error);
-        res.status(500).json({ error: error.message || 'Failed to generate integrated summary' });
+        res.status(500).json({ error: error.message || 'Falha ao gerar resumo integrado' });
     }
 }
 
@@ -213,7 +213,7 @@ export async function getSummaries(req, res) {
         });
     } catch (error) {
         console.error('Get summaries error:', error);
-        res.status(500).json({ error: 'Failed to get summaries' });
+        res.status(500).json({ error: 'Falha ao obter resumos' });
     }
 }
 
@@ -260,7 +260,7 @@ export async function getSummary(req, res) {
         });
     } catch (error) {
         console.error('Get summary error:', error);
-        res.status(500).json({ error: 'Failed to get summary' });
+        res.status(500).json({ error: 'Falha ao obter resumo' });
     }
 }
 
@@ -275,15 +275,15 @@ export async function deleteSummary(req, res) {
         const summary = db.findSummaryById(id);
 
         if (!summary || summary.userId !== req.userId) {
-            return res.status(404).json({ error: 'Summary not found' });
+            return res.status(404).json({ error: 'Resumo não encontrado' });
         }
 
         db.deleteSummary(id);
 
-        res.json({ message: 'Summary deleted successfully' });
+        res.json({ message: 'Resumo deletado com sucesso' });
     } catch (error) {
         console.error('Delete summary error:', error);
-        res.status(500).json({ error: 'Failed to delete summary' });
+        res.status(500).json({ error: 'Falha ao deletar resumo' });
     }
 }
 
@@ -304,13 +304,13 @@ export async function getApiStatus(req, res) {
             langchain: {
                 configured,
                 defaultModel: DEFAULT_MODEL,
-                message: configured ? 'LangChain/OpenAI API is configured' : 'OpenAI API key not set'
+                message: configured ? 'LangChain/API da OpenAI está configurada' : 'Chave da API OpenAI não definida'
             },
             connectionTest
         });
     } catch (error) {
         console.error('Get API status error:', error);
-        res.status(500).json({ error: 'Failed to get API status' });
+        res.status(500).json({ error: 'Falha ao obter status da API' });
     }
 }
 
