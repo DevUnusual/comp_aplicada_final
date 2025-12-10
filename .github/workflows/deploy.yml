@@ -31,8 +31,11 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
           cd /home/ubuntu/app
-
+          cd /home/ubuntu/app
+          echo "==> Criando arquivo .env"
+          echo "${{ secrets.APP_ENV_CONTENT }}" > .env
           echo "==> Instalando dependências"
+          
           npm install
 
           echo "==> Reiniciando backend com PM2"
