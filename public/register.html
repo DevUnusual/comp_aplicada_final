@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Document Summary App</title>
+    <title>Registro - App Resumo de Documentos</title>
     <link rel="stylesheet" href="/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -11,36 +11,36 @@
     <div class="auth-container">
         <div class="auth-card">
             <div class="auth-header">
-                <h1>📄 Document Summary</h1>
-                <p>Create your free account</p>
+                <h1>📄 Resumo de Documentos</h1>
+                <p>Crie sua conta gratuita</p>
             </div>
 
             <div id="registerError" class="alert alert-danger hidden"></div>
 
             <form id="registerForm">
                 <div class="form-group">
-                    <label for="fullName" class="form-label">Full Name *</label>
+                    <label for="fullName" class="form-label">Nome Completo *</label>
                     <input 
                         type="text" 
                         id="fullName" 
                         class="form-input" 
-                        placeholder="Enter your full name"
+                        placeholder="Digite seu nome completo"
                         required
                         autocomplete="name"
                     >
                 </div>
 
                 <div class="form-group">
-                    <label for="username" class="form-label">Username *</label>
+                    <label for="username" class="form-label">Usuário *</label>
                     <input 
                         type="text" 
                         id="username" 
                         class="form-input" 
-                        placeholder="Choose a username"
+                        placeholder="Escolha um usuário"
                         required
                         autocomplete="username"
                         pattern="[a-zA-Z0-9]+"
-                        title="Username can only contain letters and numbers"
+                        title="Usuário pode conter apenas letras e números"
                     >
                 </div>
 
@@ -50,19 +50,19 @@
                         type="email" 
                         id="email" 
                         class="form-input" 
-                        placeholder="Enter your email"
+                        placeholder="Digite seu email"
                         required
                         autocomplete="email"
                     >
                 </div>
 
                 <div class="form-group">
-                    <label for="password" class="form-label">Password *</label>
+                    <label for="password" class="form-label">Senha *</label>
                     <input 
                         type="password" 
                         id="password" 
                         class="form-input" 
-                        placeholder="Create a password (min. 6 characters)"
+                        placeholder="Crie uma senha (mín. 6 caracteres)"
                         required
                         minlength="6"
                         autocomplete="new-password"
@@ -70,26 +70,26 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="confirmPassword" class="form-label">Confirm Password *</label>
+                    <label for="confirmPassword" class="form-label">Confirmar Senha *</label>
                     <input 
                         type="password" 
                         id="confirmPassword" 
                         class="form-input" 
-                        placeholder="Confirm your password"
+                        placeholder="Confirme sua senha"
                         required
                         autocomplete="new-password"
                     >
                 </div>
 
-                <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+                <button type="submit" class="btn btn-primary btn-block">Criar Conta</button>
             </form>
 
             <p class="text-center mt-3">
-                Already have an account? <a href="/login.html">Sign in</a>
+                Já tem uma conta? <a href="/login.html">Entre aqui</a>
             </p>
 
             <p class="text-center mt-2">
-                <a href="/">← Back to Home</a>
+                <a href="/">← Voltar para Home</a>
             </p>
         </div>
     </div>
