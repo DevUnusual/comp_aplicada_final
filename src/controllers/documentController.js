@@ -1,4 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
+import path from 'path';
+import fs from 'fs';
 import db from '../config/database.js';
 import { deleteFile } from '../middlewares/upload.js';
 import { loadAndExtractPDF, cleanText } from '../services/pdfService.js';
@@ -222,6 +224,82 @@ export async function getDocument(req, res) {
 }
 
 /**
+ * Download document PDF
+ * GET /api/documents/:id/download
+ */
+export async function downloadDocument(req, res) {
+    try {
+        const { id } = req.params;
+
+        const document = db.findDocumentById(id);
+
+        if (!document || document.userId !== req.userId) {
+            return res.status(404).json({ error: 'Documento não encontrado' });
+        }
+
+        // Check if file exists
+        if (!fs.existsSync(document.filePath)) {
+            return res.status(404).json({ error: 'Arquivo não encontrado no servidor' });
+        }
+
+        // Set headers for download
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(document.originalName)}"`);
+        res.setHeader('Content-Length', document.fileSize);
+
+        // Stream the file
+        const fileStream = fs.createReadStream(document.filePath);
+        fileStream.pipe(res);
+
+        fileStream.on('error', (error) => {
+            console.error('File stream error:', error);
+            if (!res.headersSent) {
+                res.status(500).json({ error: 'Erro ao baixar arquivo' });
+            }
+        });
+
+    } catch (error) {
+        console.error('Download document error:', error);
+        res.status(500).json({ error: 'Falha ao baixar documento' });
+    }
+}
+
+/**
+ * Download extracted text from document
+ * GET /api/documents/:id/download-text
+ */
+export async function downloadDocumentText(req, res) {
+    try {
+        const { id } = req.params;
+
+        const document = db.findDocumentById(id);
+
+        if (!document || document.userId !== req.userId) {
+            return res.status(404).json({ error: 'Documento não encontrado' });
+        }
+
+        if (!document.extractedText) {
+            return res.status(400).json({ error: 'Documento não possui texto extraído' });
+        }
+
+        // Generate filename
+        const baseName = path.basename(document.originalName, '.pdf');
+        const filename = `${baseName}_texto.txt`;
+
+        // Set headers for download
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+        res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(filename)}"`);
+
+        // Send the text
+        res.send(document.extractedText);
+
+    } catch (error) {
+        console.error('Download document text error:', error);
+        res.status(500).json({ error: 'Falha ao baixar texto do documento' });
+    }
+}
+
+/**
  * Delete document
  * DELETE /api/documents/:id
  */
@@ -317,6 +395,8 @@ export default {
     uploadMultipleDocuments,
     getDocuments,
     getDocument,
+    downloadDocument,
+    downloadDocumentText,
     deleteDocument,
     deleteMultipleDocuments,
     reprocessDocument

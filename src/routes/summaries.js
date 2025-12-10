@@ -19,4 +19,7 @@ router.get('/', summaryController.getSummaries);
 router.get('/:id', summaryController.getSummary);
 router.delete('/:id', summaryController.deleteSummary);
 
+// Download route
+router.get('/:id/download', summaryController.downloadSummary);
+
 export default router;

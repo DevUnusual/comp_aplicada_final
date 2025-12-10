@@ -265,6 +265,105 @@ export async function getSummary(req, res) {
 }
 
 /**
+ * Download summary as TXT file
+ * GET /api/summaries/:id/download
+ */
+export async function downloadSummary(req, res) {
+    try {
+        const { id } = req.params;
+        const { format = 'txt' } = req.query;
+
+        const summary = db.findSummaryById(id);
+
+        if (!summary || summary.userId !== req.userId) {
+            return res.status(404).json({ error: 'Resumo não encontrado' });
+        }
+
+        // Get associated documents info
+        const documentIds = JSON.parse(summary.documentIds || '[]');
+        const documents = documentIds
+            .map(docId => db.findDocumentById(docId))
+            .filter(Boolean);
+
+        // Build file content
+        let content = '';
+        const createdDate = new Date(summary.createdAt).toLocaleString('pt-BR');
+        
+        if (format === 'md') {
+            // Markdown format
+            content = `# ${summary.title}\n\n`;
+            content += `**Data:** ${createdDate}\n`;
+            content += `**Tipo:** ${summary.type === 'single' ? 'Resumo Individual' : 'Resumo Integrado'}\n`;
+            content += `**Modelo:** ${summary.model}\n`;
+            
+            if (documents.length > 0) {
+                content += `\n## Documentos Fonte\n\n`;
+                documents.forEach((doc, i) => {
+                    content += `${i + 1}. ${doc.originalName}\n`;
+                });
+            }
+            
+            content += `\n## Resumo\n\n`;
+            content += summary.content;
+            
+            if (summary.tokensUsed || summary.processingTime) {
+                content += `\n\n---\n\n`;
+                content += `**Metadados:**\n`;
+                if (summary.tokensUsed) content += `- Tokens utilizados: ${summary.tokensUsed}\n`;
+                if (summary.processingTime) content += `- Tempo de processamento: ${(summary.processingTime / 1000).toFixed(1)}s\n`;
+                if (summary.method) content += `- Método: ${summary.method}\n`;
+            }
+        } else {
+            // Plain text format
+            content = `${summary.title}\n`;
+            content += `${'='.repeat(summary.title.length)}\n\n`;
+            content += `Data: ${createdDate}\n`;
+            content += `Tipo: ${summary.type === 'single' ? 'Resumo Individual' : 'Resumo Integrado'}\n`;
+            content += `Modelo: ${summary.model}\n`;
+            
+            if (documents.length > 0) {
+                content += `\nDocumentos Fonte:\n`;
+                documents.forEach((doc, i) => {
+                    content += `  ${i + 1}. ${doc.originalName}\n`;
+                });
+            }
+            
+            content += `\n${'─'.repeat(50)}\n\n`;
+            content += `RESUMO:\n\n`;
+            content += summary.content;
+            
+            if (summary.tokensUsed || summary.processingTime) {
+                content += `\n\n${'─'.repeat(50)}\n\n`;
+                content += `Metadados:\n`;
+                if (summary.tokensUsed) content += `  - Tokens utilizados: ${summary.tokensUsed}\n`;
+                if (summary.processingTime) content += `  - Tempo de processamento: ${(summary.processingTime / 1000).toFixed(1)}s\n`;
+                if (summary.method) content += `  - Método: ${summary.method}\n`;
+            }
+        }
+
+        // Generate filename
+        const safeTitle = summary.title
+            .replace(/[^a-zA-Z0-9\s\-_àáâãéêíóôõúüçÀÁÂÃÉÊÍÓÔÕÚÜÇ]/g, '')
+            .replace(/\s+/g, '_')
+            .substring(0, 50);
+        const extension = format === 'md' ? 'md' : 'txt';
+        const filename = `${safeTitle}_resumo.${extension}`;
+
+        // Set headers for download
+        const contentType = format === 'md' ? 'text/markdown' : 'text/plain';
+        res.setHeader('Content-Type', `${contentType}; charset=utf-8`);
+        res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(filename)}"`);
+
+        // Send the content
+        res.send(content);
+
+    } catch (error) {
+        console.error('Download summary error:', error);
+        res.status(500).json({ error: 'Falha ao baixar resumo' });
+    }
+}
+
+/**
  * Delete summary
  * DELETE /api/summaries/:id
  */
@@ -319,6 +418,7 @@ export default {
     createMultipleSummary,
     getSummaries,
     getSummary,
+    downloadSummary,
     deleteSummary,
     getApiStatus
 };

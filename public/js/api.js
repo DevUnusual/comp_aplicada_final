@@ -75,6 +75,57 @@ async function apiRequest(endpoint, options = {}) {
 }
 
 /**
+ * Download file from API
+ */
+async function downloadFile(endpoint, defaultFilename) {
+    const url = `${API_BASE_URL}${endpoint}`;
+    const token = TokenManager.get();
+
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || 'Download failed');
+        }
+
+        // Get filename from Content-Disposition header if available
+        const contentDisposition = response.headers.get('Content-Disposition');
+        let filename = defaultFilename;
+        
+        if (contentDisposition) {
+            const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+            if (filenameMatch && filenameMatch[1]) {
+                filename = decodeURIComponent(filenameMatch[1].replace(/['"]/g, ''));
+            }
+        }
+
+        // Create blob and download
+        const blob = await response.blob();
+        const downloadUrl = window.URL.createObjectURL(blob);
+        
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        window.URL.revokeObjectURL(downloadUrl);
+        
+        return { success: true, filename };
+    } catch (error) {
+        console.error('Download Error:', error);
+        throw error;
+    }
+}
+
+/**
  * Auth API
  */
 const AuthAPI = {
@@ -207,6 +258,16 @@ const DocumentsAPI = {
         return apiRequest(`/documents/${id}/reprocess`, {
             method: 'POST'
         });
+    },
+
+    // Download original PDF
+    download: async (id, filename = 'document.pdf') => {
+        return downloadFile(`/documents/${id}/download`, filename);
+    },
+
+    // Download extracted text
+    downloadText: async (id, filename = 'document_texto.txt') => {
+        return downloadFile(`/documents/${id}/download-text`, filename);
     }
 };
 
@@ -246,6 +307,12 @@ const SummariesAPI = {
         return apiRequest(`/summaries/${id}`, {
             method: 'DELETE'
         });
+    },
+
+    // Download summary as file
+    download: async (id, format = 'txt', filename = 'resumo.txt') => {
+        const endpoint = `/summaries/${id}/download?format=${format}`;
+        return downloadFile(endpoint, filename);
     }
 };
 

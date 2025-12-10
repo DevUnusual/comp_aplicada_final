@@ -18,6 +18,10 @@ router.get('/:id', documentController.getDocument);
 router.delete('/:id', documentController.deleteDocument);
 router.delete('/', documentController.deleteMultipleDocuments);
 
+// Download routes
+router.get('/:id/download', documentController.downloadDocument);
+router.get('/:id/download-text', documentController.downloadDocumentText);
+
 // Reprocess route
 router.post('/:id/reprocess', documentController.reprocessDocument);
 

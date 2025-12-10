@@ -196,7 +196,7 @@ async function checkApiStatus() {
         const statusEl = document.getElementById('apiStatus');
         
         if (statusEl) {
-            if (status.openai.configured) {
+            if (status.langchain && status.langchain.configured) {
                 statusEl.innerHTML = '<span class="badge badge-success">OpenAI Connected</span>';
             } else {
                 statusEl.innerHTML = '<span class="badge badge-warning">OpenAI Not Configured</span>';
@@ -254,11 +254,18 @@ function renderDocuments() {
             </div>
             <div class="document-actions">
                 <button class="btn btn-sm btn-primary" onclick="summarizeDocument('${doc.id}')" 
-                        ${doc.status !== 'processed' ? 'disabled' : ''}>
+                        ${doc.status !== 'processed' ? 'disabled' : ''} title="Gerar resumo">
                     Summarize
                 </button>
-                <button class="btn btn-sm btn-outline" onclick="viewDocument('${doc.id}')">View</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteDocument('${doc.id}')">Delete</button>
+                <button class="btn btn-sm btn-outline" onclick="viewDocument('${doc.id}')" title="Visualizar texto">
+                    View
+                </button>
+                <button class="btn btn-sm btn-success" onclick="downloadDocument('${doc.id}', '${doc.originalName}')" title="Baixar PDF original">
+                    ⬇ PDF
+                </button>
+                <button class="btn btn-sm btn-danger" onclick="deleteDocument('${doc.id}')" title="Deletar">
+                    Delete
+                </button>
             </div>
         </div>
     `).join('');
@@ -282,50 +289,69 @@ function toggleDocumentSelection(docId) {
  * Update selection action buttons
  */
 function updateSelectionActions() {
-    const actionsDiv = document.getElementById('selectionActions');
-    if (!actionsDiv) return;
+    const actionsEl = document.getElementById('selectionActions');
+    if (!actionsEl) return;
 
-    if (selectedDocuments.size >= 2) {
-        actionsDiv.classList.remove('hidden');
-        actionsDiv.innerHTML = `
-            <span>${selectedDocuments.size} documents selected</span>
-            <button class="btn btn-primary btn-sm" onclick="summarizeMultiple()">
-                Generate Integrated Summary
+    if (selectedDocuments.size > 0) {
+        actionsEl.innerHTML = `
+            <span>${selectedDocuments.size} selected</span>
+            <button class="btn btn-sm btn-primary" onclick="summarizeMultiple()" 
+                    ${selectedDocuments.size < 2 ? 'disabled' : ''}>
+                Summarize Selected (${selectedDocuments.size})
             </button>
-            <button class="btn btn-danger btn-sm" onclick="deleteSelected()">Delete Selected</button>
-            <button class="btn btn-outline btn-sm" onclick="clearSelection()">Clear Selection</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteSelected()">
+                Delete Selected
+            </button>
+            <button class="btn btn-sm btn-outline" onclick="clearSelection()">
+                Clear Selection
+            </button>
         `;
+        actionsEl.classList.remove('hidden');
     } else {
-        actionsDiv.classList.add('hidden');
+        actionsEl.classList.add('hidden');
     }
 }
 
 /**
- * Clear document selection
+ * Download document PDF
  */
-function clearSelection() {
-    selectedDocuments.clear();
-    renderDocuments();
+async function downloadDocument(docId, filename) {
+    try {
+        showToast('Iniciando download...', 'info');
+        await API.Documents.download(docId, filename);
+        showToast('Download concluído!', 'success');
+    } catch (error) {
+        showToast(error.message || 'Erro ao baixar documento', 'error');
+    }
+}
+
+/**
+ * Download document extracted text
+ */
+async function downloadDocumentText(docId, filename) {
+    try {
+        const baseName = filename.replace('.pdf', '');
+        await API.Documents.downloadText(docId, `${baseName}_texto.txt`);
+        showToast('Texto baixado com sucesso!', 'success');
+    } catch (error) {
+        showToast(error.message || 'Erro ao baixar texto', 'error');
+    }
 }
 
 /**
  * Summarize single document
  */
 async function summarizeDocument(docId) {
-    const doc = documents.find(d => d.id === docId);
-    if (!doc) return;
-
-    showLoading('Generating summary... This may take up to 30 seconds.');
+    showLoading('Generating summary...');
 
     try {
         const result = await API.Summaries.createSingle(docId);
         showToast('Summary generated successfully', 'success');
-        
-        // Show summary modal
-        showSummaryModal(result.summary);
-        
-        await loadStats();
         await loadSummaries();
+        await loadStats();
+        
+        // Show the summary
+        showSummaryModal(result.summary);
     } catch (error) {
         showToast(error.message, 'error');
     } finally {
@@ -338,23 +364,22 @@ async function summarizeDocument(docId) {
  */
 async function summarizeMultiple() {
     if (selectedDocuments.size < 2) {
-        showToast('Please select at least 2 documents', 'error');
+        showToast('Select at least 2 documents', 'warning');
         return;
     }
 
-    showLoading('Generating integrated summary... This may take up to 30 seconds.');
+    showLoading('Generating integrated summary...');
 
     try {
-        const docIds = Array.from(selectedDocuments);
-        const result = await API.Summaries.createMultiple(docIds);
+        const result = await API.Summaries.createMultiple(Array.from(selectedDocuments));
         showToast('Integrated summary generated successfully', 'success');
-        
-        // Show summary modal
-        showSummaryModal(result.summary);
-        
-        clearSelection();
-        await loadStats();
+        selectedDocuments.clear();
+        await loadDocuments();
         await loadSummaries();
+        await loadStats();
+        
+        // Show the summary
+        showSummaryModal(result.summary);
     } catch (error) {
         showToast(error.message, 'error');
     } finally {
@@ -363,7 +388,7 @@ async function summarizeMultiple() {
 }
 
 /**
- * View document details
+ * View document text
  */
 async function viewDocument(docId) {
     try {
@@ -399,12 +424,20 @@ async function deleteSelected() {
     try {
         await API.Documents.deleteMultiple(Array.from(selectedDocuments));
         showToast('Documents deleted', 'success');
-        clearSelection();
+        selectedDocuments.clear();
         await loadDocuments();
         await loadStats();
     } catch (error) {
         showToast(error.message, 'error');
     }
+}
+
+/**
+ * Clear selection
+ */
+function clearSelection() {
+    selectedDocuments.clear();
+    renderDocuments();
 }
 
 /**
@@ -432,7 +465,7 @@ function renderSummaries() {
             <div class="empty-state">
                 <div class="empty-icon">📝</div>
                 <h3>No summaries yet</h3>
-                <p>Generate your first summary from a document</p>
+                <p>Select documents and generate summaries to see them here</p>
             </div>
         `;
         return;
@@ -450,8 +483,18 @@ function renderSummaries() {
                 </div>
             </div>
             <div class="document-actions">
-                <button class="btn btn-sm btn-primary" onclick="viewSummary('${summary.id}')">View</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteSummary('${summary.id}')">Delete</button>
+                <button class="btn btn-sm btn-primary" onclick="viewSummary('${summary.id}')" title="Visualizar resumo">
+                    View
+                </button>
+                <button class="btn btn-sm btn-success" onclick="downloadSummary('${summary.id}', 'txt')" title="Baixar como TXT">
+                    ⬇ TXT
+                </button>
+                <button class="btn btn-sm btn-outline" onclick="downloadSummary('${summary.id}', 'md')" title="Baixar como Markdown">
+                    ⬇ MD
+                </button>
+                <button class="btn btn-sm btn-danger" onclick="deleteSummary('${summary.id}')" title="Deletar">
+                    Delete
+                </button>
             </div>
         </div>
     `).join('');
@@ -466,6 +509,20 @@ async function viewSummary(summaryId) {
         showSummaryModal(data.summary);
     } catch (error) {
         showToast(error.message, 'error');
+    }
+}
+
+/**
+ * Download summary as file
+ */
+async function downloadSummary(summaryId, format = 'txt') {
+    try {
+        showToast('Iniciando download...', 'info');
+        const extension = format === 'md' ? 'md' : 'txt';
+        await API.Summaries.download(summaryId, format, `resumo.${extension}`);
+        showToast('Resumo baixado com sucesso!', 'success');
+    } catch (error) {
+        showToast(error.message || 'Erro ao baixar resumo', 'error');
     }
 }
 
@@ -567,6 +624,22 @@ function showSummaryModal(summary) {
         <span><strong>Time:</strong> ${summary.processingTime ? (summary.processingTime / 1000).toFixed(1) + 's' : 'N/A'}</span>
     `;
 
+    // Add download buttons to modal
+    const modalActions = modal.querySelector('.modal-actions');
+    if (modalActions) {
+        modalActions.innerHTML = `
+            <button class="btn btn-success" onclick="downloadSummary('${summary.id}', 'txt')">
+                ⬇ Download TXT
+            </button>
+            <button class="btn btn-outline" onclick="downloadSummary('${summary.id}', 'md')">
+                ⬇ Download Markdown
+            </button>
+            <button class="btn btn-secondary" onclick="closeModal('summaryModal')">
+                Fechar
+            </button>
+        `;
+    }
+
     openModal('summaryModal');
 }
 
@@ -579,6 +652,22 @@ function showDocumentModal(doc) {
 
     modal.querySelector('.modal-header h2').textContent = doc.originalName;
     modal.querySelector('.document-text').textContent = doc.extractedText || 'No text extracted';
+
+    // Add download buttons to modal
+    const modalActions = modal.querySelector('.modal-actions');
+    if (modalActions) {
+        modalActions.innerHTML = `
+            <button class="btn btn-success" onclick="downloadDocument('${doc.id}', '${doc.originalName}')">
+                ⬇ Download PDF
+            </button>
+            <button class="btn btn-outline" onclick="downloadDocumentText('${doc.id}', '${doc.originalName}')">
+                ⬇ Download Texto
+            </button>
+            <button class="btn btn-secondary" onclick="closeModal('documentModal')">
+                Fechar
+            </button>
+        `;
+    }
 
     openModal('documentModal');
 }
@@ -685,7 +774,7 @@ function formatFileSize(bytes) {
  */
 function formatDate(dateString) {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString('pt-BR', {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
@@ -717,5 +806,8 @@ window.deleteSelected = deleteSelected;
 window.clearSelection = clearSelection;
 window.viewSummary = viewSummary;
 window.deleteSummary = deleteSummary;
+window.downloadDocument = downloadDocument;
+window.downloadDocumentText = downloadDocumentText;
+window.downloadSummary = downloadSummary;
 window.showProfileModal = showProfileModal;
 window.closeModal = closeModal;
