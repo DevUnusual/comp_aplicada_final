@@ -1,0 +1,45 @@
+name: Deploy Application to EC2
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Copiar arquivos para a EC2
+    - name: Copy project to EC2
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        source: "./"
+        target: "/home/ubuntu/app"
+
+    # Executar comandos na EC2
+    - name: Run deploy commands on EC2
+      uses: appleboy/ssh-action@v0.1.6
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          cd /home/ubuntu/app
+          cd /home/ubuntu/app
+          echo "==> Criando arquivo .env"
+          echo "${{ secrets.APP_ENV_CONTENT }}" > .env
+          echo "==> Instalando dependências"
+          
+          npm install
+
+          echo "==> Reiniciando backend com PM2"
+          pm2 stop backend || true
+          pm2 start app.js --name backend
+
+          echo "==> Deploy concluído!"

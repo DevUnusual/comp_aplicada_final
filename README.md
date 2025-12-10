@@ -2,6 +2,8 @@
 
 Aplicação web para gerenciamento e análise de documentos PDF com capacidade de geração de resumos individuais e integrados utilizando **LangChain** + LLM (OpenAI GPT).
 
+[![Tecnologies](https://skillicons.dev/icons?i=js,html,css,nodejs,aws,express,npm)](https://skillicons.dev)
+
 ## 🚀 Features
 
 - **Autenticação completa**: Registro, login, edição de perfil
@@ -205,7 +207,7 @@ sudo apt install -y nodejs
 ### 2. Clonar e Configurar
 
 ```bash
-cd /home/ubuntu
+cd /home/ubuntu/app
 git clone <repo-url> document-summary-app
 cd document-summary-app
 
